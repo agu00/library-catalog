@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+    <title>Library Catalog</title>
+
+    <style>
+        #books-table {width:100%;}
+        th {color: white;background-color:black;text-align:left;padding:0.2em;font-weight:300;}
+        td {color:black;border-bottom: 1px solid black;padding:0.6em 0.6em 0.6em 0.2em;vertical-align: middle;text-align: left;}
+        .peoplebtn {background-color: black;color: white;padding: 3px 13px 5px 13px;cursor: pointer;border: 1px solid black;}
+        .dropdown-content {display: none;background-color: white;z-index: 1;color:black;cursor: pointer;}
+        .show {display:block;}
+        a {text-decoration: none;color:#2C6EF2;}
+        .dropDownA {line-height: 3em;color:black;}
+        .dropDownAClicked {font-weight:bold;}
+                
+    </style>
+
+</head>
+<body>
+
+      
+    <input type="text" onkeyup="searchItem()" id="searchInput" placeholder="Search..." style="height:29px;">&nbsp;&nbsp;<button onclick="reset()" class="peoplebtn">Reset</button>
+    <p> </p>
+    <div class="dropdown">
+        <button onclick="dropDown()" class="peoplebtn">Type</button>
+        <div id="myDropdown" class="dropdown-content">
+          <a class="dropDownA" onclick="biography()">Biography |</a>
+          <a class="dropDownA" onclick="novel()">Novel |</a>
+          <a class="dropDownA" onclick="poetry()">Poetry</a>
+        </div>
+    </div>
+    <p> </p>
+    
+    <table id="books-table">
+        <tbody id="table">
+            <tr><th>Image</th><th>Title</th><th>Author</th><th>Publication Year</th><th>Number Of Pages</th><th>ISBN-13</th><th>Page</th></tr>
+        </tbody>
+    </table>
+    <br>
+
+<script>
+        
+    //data 
+    var table = document.getElementById("table");
+     var cover = 'https://upload.wikimedia.org/wikipedia/commons/d/dd/Gray_book.png';
+     var books = [
+             {image: cover, type: "novel", title: "Pride and Prejudice", author: "Jane Austen", year: 2016, numerOfPages: 480, isbn: "978-0141439518", page: "https://en.wikipedia.org/wiki/Pride_and_Prejudice"},
+             {image: cover, type: "biography", title: "Anne Frank: The Diary of a Young Girl", author: "Anne Frank", year: 2002, numerOfPages: 341, isbn: "978-0385480338", page: "https://en.wikipedia.org/wiki/The_Diary_of_a_Young_Girl"},
+             {image: cover, type: "novel", title: "Harry Potter and the Sorcerer's Stone", author: "J.K. Rowling", year: 2002, numerOfPages: 256, isbn: "978-0545790352", page: "https://en.wikipedia.org/wiki/Harry_Potter_and_the_Philosopher%27s_Stone"},
+             {image: cover, type: "novel", title: "Life of Pi", author: "Yann Martel", year: 2003, numerOfPages: 326, isbn: "978-0156027328", page: "https://en.wikipedia.org/wiki/Life_of_Pi"},
+             {image: cover, type: "poetry", title: "Leaves of Grass", author: "Walt Whitman", year: 2003, numerOfPages: 160, isbn: "978-1449505714", page: "https://en.wikipedia.org/wiki/Leaves_of_Grass"},
+             {image: cover, type: "poetry", title: "Milk and Honey", author: "Rupi Kaur", year: 2003, numerOfPages: 208, isbn: "978-1449474256", page: "https://en.wikipedia.org/wiki/Milk_and_Honey_(poetry_collection)"},
+             {image: cover, type: "novel", title: "1984", author: "George Orwell", year: 2013, numerOfPages: 328, isbn: "978-0451524935", page: "https://en.wikipedia.org/wiki/Nineteen_Eighty-Four"},
+             {image: cover, type: "novel", title: "The Two Towers: Being the Second Part of The Lord of the Rings", author: "John Ronald Reuel Tolkien", year: 1998, numerOfPages: 352, isbn: "978-0547928203", page: "https://en.wikipedia.org/wiki/The_Two_Towers"},
+             {image: cover, type: "novel", title: "Brave New World", author: "Aldous Huxley", year: 1990, numerOfPages: 288, isbn: "978-0060850524", page: "https://en.wikipedia.org/wiki/Brave_New_World"},
+             {image: cover, type: "novel", title: "Breakfast of Champions", author: "Kurt Vonnegut Jr.", year: 1998, numerOfPages: 303, isbn: "978-0385334204", page: "https://en.wikipedia.org/wiki/Breakfast_of_Champions"},
+             {image: cover, type: "novel", title: "The Hobbit", author: "John Ronald Reuel Tolkien", year: 1998, numerOfPages: 133, isbn: "978-0345445605", page: "https://en.wikipedia.org/wiki/The_Hobbit"},
+             {image: cover, type: "biography", title: "Churchill: Walking with Destiny", author: "Andrew Roberts", year: 2018, numerOfPages: 1152, isbn: "978-1101980996", page: "https://en.wikipedia.org/wiki/The_Hobbit"},
+             {image: cover, type: "novel", title: "Salem's Lot", author: "Stephen King", year: 2002, numerOfPages: 439, isbn: "978-0671039745", page: "https://en.wikipedia.org/wiki/%27Salem%27s_Lot"},
+             {image: cover, type: "novel", title: "Animal Farm", author: "George Orwell", year: 2004, numerOfPages: 176, isbn: "978-0358093152", page: "https://en.wikipedia.org/wiki/Animal_Farm"},
+             {image: cover, type: "novel", title: "Harry Potter And The Prisoner Of Azkaban", author: "J.K. Rowling", year: 2002, numerOfPages: 448, isbn: "978-0439136365", page: "https://en.wikipedia.org/wiki/Harry_Potter_and_the_Prisoner_of_Azkaban"},
+             {image: cover, type: "novel", title: "The Outsider", author: "Stephen King", year: 2020, numerOfPages: 576, isbn: "978-1501181009", page: "https://en.wikipedia.org/wiki/The_Outsider_(King_novel)"},
+             {image: cover, type: "novel", title: "Moby Dick", author: "Herman Melville", year: 2002, numerOfPages: 88, isbn: "978-9380028224", page: "https://en.wikipedia.org/wiki/Moby-Dick"},
+             {image: cover, type: "biography", title: "Dreams from My Father", author: "Barack Obama", year: 2019, numerOfPages: 464, isbn: "978-1400082773", page: "https://en.wikipedia.org/wiki/Dreams_from_My_Father"}
+             ];
+
+    
+
+// upload data
+        
+(function() {
+             for (var i = 0; i < books.length; i ++){
+
+                 var newTr = document.createElement("tr");
+                 table.appendChild(newTr);
+                 var newTdImage = document.createElement("td");
+                 var newImg = document.createElement("img");
+                 newImg.src = books[i].image;
+                 newImg.style.width = "100px";
+                 var newTdTitle = document.createElement("td");
+                 newTdTitle.innerHTML= books[i].title;
+                 var newTdAuthor = document.createElement("td");
+                 newTdAuthor.innerHTML= books[i].author;
+                 var newTdYear = document.createElement("td");
+                 newTdYear.innerHTML= books[i].year;
+                 var newTdNumber = document.createElement("td");
+                 newTdNumber.innerHTML= books[i].numerOfPages;
+                 var newTdIsbn = document.createElement("td");
+                 newTdIsbn.innerHTML= books[i].isbn;
+                 var newTdPage = document.createElement("td");
+                 var newA = document.createElement("a");
+                 newA.target = '_blank';
+                 newA.innerHTML = "Read More";
+                 newA.href = books[i].page;
+                 newTdImage.appendChild(newImg);
+                 newTdPage.appendChild(newA);
+                 newTr.appendChild(newTdImage);
+                 newTr.appendChild(newTdTitle);
+                 newTr.appendChild(newTdAuthor); 
+                 newTr.appendChild(newTdYear);
+                 newTr.appendChild(newTdNumber);
+                 newTr.appendChild(newTdIsbn);
+                 newTr.appendChild(newTdPage); 
+             }           
+            })();
+  
+     
+     
+     var biographyList = [];
+     var novelList = [];
+     var poetryList= [];
+     var tRs = document.querySelectorAll("tr");
+     var inputField = document.getElementById("searchInput");
+     var allTypes = document.getElementsByClassName("dropDownA") 
+     
+     // dropdown
+
+     function dropDown() {
+         document.getElementById("myDropdown").classList.toggle("show");
+     }
+
+     // type filters
+
+     function biography(){
+
+         for(var u = 0; u < allTypes.length; u++){
+             if(u == 0) {
+                 allTypes[u].classList.add("dropDownAClicked");
+             } else {
+                 allTypes[u].classList.remove("dropDownAClicked");
+             }
+         }
+         
+         for(var j = 0; j < books.length; j++){
+             if (books[j].type == "biography") {
+                 tRs[j+1].style.display = "table-row";
+                 biographyList.push(books[j]);
+             } else {
+                 tRs[j+1].style.display = "none";
+             }
+         }
+     }
+ 
+     function novel(){
+
+         for(var u = 0; u < allTypes.length; u++){
+             if(u == 1) {
+                 allTypes[u].classList.add("dropDownAClicked");
+             } else {
+                 allTypes[u].classList.remove("dropDownAClicked");
+             }
+         }
+
+         for(var j = 0; j < books.length; j++){
+             if (books[j].type == "novel") {
+                 tRs[j+1].style.display = "table-row";
+                 novelList.push(books[j]);
+             } else {
+                 tRs[j+1].style.display = "none";
+             }
+         }
+     }
+
+
+     function poetry(){
+
+         for(var u = 0; u < allTypes.length; u++){
+             if(u == 2) {
+                 allTypes[u].classList.add("dropDownAClicked");
+             } else {
+                 allTypes[u].classList.remove("dropDownAClicked");
+             }
+         }
+
+         for(var j = 0; j < books.length; j++){
+             if (books[j].type == "poetry") {
+                 tRs[j+1].style.display = "table-row";
+                 poetryList.push(books[j]);
+             } else {
+                 tRs[j+1].style.display = "none";
+             }
+         }
+         }
+
+     
+     // search 
+
+     function searchItem() {
+         var filter = inputField.value.toUpperCase();
+
+         if (biographyList.length !=0) {
+
+             for(var j = 0; j < biographyList.length; j++){
+                 if(biographyList[j].title.toUpperCase().indexOf(filter) > -1 || biographyList[j].author.toUpperCase().indexOf(filter) > -1) {
+                     for(var t=0; t < books.length;t++) {
+                         if (books[t].title == biographyList[j].title) {
+                             tRs[t+1].style.display = "table-row";
+                         } else if (filter == ""){
+                             if (books[t].title == biographyList[j].title) {
+                                 tRs[t+1].style.display = "table-row";
+                             }
+                         } else {
+                             tRs[t+1].style.display = "none";
+                         }
+                     }
+                 } 
+             } 
+         } else if (novelList.length !=0) {
+
+             for(var j = 0; j < novelList.length; j++){
+                 if(novelList[j].title.toUpperCase().indexOf(filter) > -1 || novelList[j].author.toUpperCase().indexOf(filter) > -1) {
+                     for(var t=0; t < books.length;t++) {
+                         if (books[t].title == novelList[j].title) {
+                             tRs[t+1].style.display = "table-row";
+                         } else if (filter == ""){
+                             if (books[t].title == novelList[j].title) {
+                                 tRs[t+1].style.display = "table-row";
+                             }
+                         } else {
+                             tRs[t+1].style.display = "none";
+                         }
+                     }
+                 } 
+             } 
+
+         } else if (poetryList.length !=0) {
+
+             for(var j = 0; j < poetryList.length; j++){
+                 if(poetryList[j].title.toUpperCase().indexOf(filter) > -1 || poetryList[j].author.toUpperCase().indexOf(filter) > -1) {
+                     for(var t=0; t < books.length;t++) {
+                         if (books[t].title == poetryList[j].title) {
+                             tRs[t+1].style.display = "table-row";
+                         } else if (filter == ""){
+                             if (books[t].title == poetryList[j].title) {
+                                 tRs[t+1].style.display = "table-row";
+                             }
+                         } else {
+                             tRs[t+1].style.display = "none";
+                         }
+                     }
+                 }
+             } 
+
+
+         } else if (biographyList.length == 0 && novelList.length == 0 && poetryList.length == 0) {
+             for(var j = 1; j < tRs.length; j++){
+                 if(tRs[j].innerText.toUpperCase().indexOf(filter) > -1) {
+                     tRs[j].style.display = "table-row";
+                 } else {
+                     tRs[j].style.display = "none";
+                 }
+             } 
+         }
+     }   
+
+     // reset
+
+     function reset() {
+
+             for(var j = 1; j < tRs.length; j++) {
+                 
+                 tRs[j].style.display = "table-row";
+                 biographyList.length = [];
+                 novelList.length = [];
+                 poetryList.length = [];
+                 inputField.value = " ";
+             } 
+
+             document.getElementById("myDropdown").classList.remove("show");
+
+             for(var u = 0; u < allTypes.length; u++){
+                 allTypes[u].classList.remove("dropDownAClicked");
+             }
+     }
+
+</script>
+
+</body>
+</html>
